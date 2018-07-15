@@ -1,0 +1,2 @@
+-pash 要使用注释 #!/bin/bash
+shell 要使用注释 #！/usr/bin
