@@ -1,0 +1,76 @@
+加载顺序
+context-param  listener  filter  servlet
+
+标签
+ <display-name>appName</display-name>
+</distributable> 适合分布式环境
+
+<context-param>
+<param-name>
+<param-value>
+spring配置文件默认为/WEB-INF/applicationcontext.xml;配置用名
+param-name -> contextConfigLocation 
+
+部署多个项目，使用webAppRootKey指向不同的项目名，如webapp.root;多项目自定义区分；
+可使用${webapp.root}指向对应项目根路径
+<context-param>
+<param-name>webAppRootKey</param-name>
+<param-value>lgk.root</param-value>
+</context-param>
+servlet中
+String param_value=getServletContext().getInitParamter("param_name");//
+或者 getServletConfig().getServletContext().getInitParameter()
+jsp中
+${initParam.param_name}
+
+<listener>
+javax.servlet.ServletContextListener  监听应用的启动和停止事件
+javax.servlet.http.HttpSessionListener  监听Session的创建和失效事件
+(@WebListener注解类同样可以注册监听)
+=> spring加载两种方式（listener配置；serverlet配置）
+(1)<listener>org.springframework.web.context.ContextLoaderListener</listener>
+(2)
+<servlet>
+<servlet-name>context</servlet-name>
+<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
+<load-on-startup>1</load-on-startup>
+</servlet>
+filter中若使用bean，需要使第一种方式，否则bean为null
+
+<filter>
+<filter-name>
+<filter-class>
+<init-param>
+<param-name>
+<param-value>
+
+<filter-mapping>
+<filter-mapping>
+<url-pattern>
+filter配置
+(1)在Filter类中通过Annotation进行配置
+(2)web.xml
+过滤器实现接口javax.servlet.filter
+void init(FilterConfig config)  初始化（获得初始化参数，FilterConfig.getInitParameter();）
+void destory()  资源回收
+void doFilter(ServletRequest req,ServletResponse rsp,FilterChain chain)  过滤处理
+=>chain.doFilter(req,rsp);
+
+servlet创建时机
+(1)系统第一次请求servlet时创建
+(2)系统启动时创建 load-on-startup servlet
+生命周期
+创建实例；init初始化；存在容器中，响应请求；destory销毁实例	
+servlet配置
+(1)@WebServlet Annotation
+(2)web.xml
+获取参数
+ServletConfig.getInitParameter(param_name);与ServletContext获取全局参数不同，此为获取当前servlet参数
+
+配置DispatcherServlet时指定<init-param>标签 => classpath:config/spring-servlet.xml
+classpath是web项目的类路径，可以理解为classes下面
+classpath和classpath*区别：同名资源存在时，classpath只从第一个符合条件的classpath中加载资源，而classpath*会从所有的classpath中加载符合条件的资源。classpath*，需要遍历所有的classpath，效率肯定比不上classpath，因此在项目设计的初期就尽量规划好资源文件所在的路径，避免使用classpath*来加载。
+
+<welcome-file-list>
+<welcome-file>index.html
+<welcome-file-list>包含一个子元素<welcome-file>，<welcome-file>用来指定首页文件名称。<welcome-file-list>元素可以包含一个或多个<welcome-file>子元素。如果在第一个<welcome-file>元素中没有找到指定的文件，Web容器就会尝试显示第二个，以此类推。
